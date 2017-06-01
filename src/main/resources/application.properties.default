@@ -21,3 +21,6 @@ spring.mail.password=
 spring.mail.port=465
 spring.mail.properties.mail.smtp.ssl.enable=true
 mail.to=jpalomino@tecsup.edu.pe
+
+#Test: mail, lead-write, lead-read
+test=

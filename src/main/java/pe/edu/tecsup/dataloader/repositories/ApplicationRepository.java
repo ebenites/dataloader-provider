@@ -13,9 +13,7 @@ import pe.edu.tecsup.dataloader.models.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -116,7 +114,7 @@ public class ApplicationRepository {
     public void registerLead(Lead lead) throws Exception {
         log.info("registerLead: lead:" + lead);
         try {
-            String sql = "INSERT INTO WEB_INTERES (SISID, CRMID) VALUES (?, ?)";
+            String sql = "INSERT INTO WEB_INTERES_CRM (SISID, CRMID) VALUES (?, ?)";
             jdbcTemplate.update(sql, lead.getSisid(), lead.getId());
         }catch (Exception e){
             log.error(e, e);

@@ -96,10 +96,27 @@ public class ScheduledTask {
         }
     }
 
+    @Value("${test:}")
+    private String TEST;
+
+    @Scheduled(fixedDelay = Long.MAX_VALUE)
+    public void test(){
+        log.info("Test init " + TEST + "...");
+
+        if("mail".equalsIgnoreCase(TEST)){
+            mailer.sendMail("Test de correo");
+        }else if("lead-write".equalsIgnoreCase(TEST)){
+            processingWriteLeads();
+        }else if("lead-read".equalsIgnoreCase(TEST)){
+            processingReaderLeads();
+        }
+
+
+    }
+
     @Scheduled(cron="0 * * * * *")
     public void keepalive(){
         log.info("keep alive ScheduledTask ...");
-//        mailer.sendMail("Test");
     }
 
     @Scheduled(cron="0 0 * * * *")
@@ -144,7 +161,7 @@ public class ScheduledTask {
             reader.getHeader(true);
 
             Lead lead;
-            while( (lead = reader.read(Lead.class, new String[]{"id", "sisid"}, processors)) != null ) {
+            while( (lead = reader.read(Lead.class, new String[]{"id", "sisid", "lastname", "firstname", "company", "mobilephone", "phone", "email", "status", "leadsource", "ownerid", "apematerno", "cargo", "fechalpd", "leyproteccion", "area", "documento", "sexo", "distrito", "nacimiento", "tipodocpersona", "tipodocempresa", "numdocpersona", "numdocempresa", "tipo", "sede", "oficina", "conocido", "areainteres", "familia", "producto", "status"})) != null ) {
                 log.info(String.format("lineNo=%s, rowNo=%s, user=%s", reader.getLineNumber(), reader.getRowNumber(), lead));
                 applicationService.registerLead(lead);
             }
