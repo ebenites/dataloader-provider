@@ -118,7 +118,7 @@ public class ApplicationRepository {
             jdbcTemplate.update(sql, lead.getSisid(), lead.getId());
         }catch (Exception e){
             log.error(e, e);
-            throw e;
+//            throw e;
         }
     }
 
