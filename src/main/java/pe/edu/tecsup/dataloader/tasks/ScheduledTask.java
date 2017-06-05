@@ -3,8 +3,6 @@ package pe.edu.tecsup.dataloader.tasks;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.supercsv.cellprocessor.Optional;
@@ -22,9 +20,9 @@ import pe.edu.tecsup.dataloader.models.User;
 import pe.edu.tecsup.dataloader.services.ApplicationService;
 import pe.edu.tecsup.dataloader.utils.Mailer;
 
-import javax.mail.internet.MimeMessage;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -116,7 +114,7 @@ public class ScheduledTask {
 
     @Scheduled(cron="0 * * * * *")
     public void keepalive(){
-        log.info("keep alive ScheduledTask ...");
+        log.info(new Date() + " - keep alive ScheduledTask ...");
     }
 
     @Scheduled(cron="0 0 * * * *")
