@@ -128,11 +128,11 @@ public class ScheduledTask {
             // CSV Writer
             ICsvBeanWriter writer = new CsvBeanWriter(new FileWriter(CSVDATAPATH+"lead.csv"), CsvPreference.STANDARD_PREFERENCE);
 
-            writer.writeHeader("SISID", "LASTNAME", "FIRSTNAME", "COMPANY", "MOBILEPHONE", "PHONE", "EMAIL", "STATUS", "LEADSOURCE", "OWNERID", "CRM_APELLIDO_MATERNO__C", "CRM_CARGO__C", "CRM_FECHA_LDP__C", "CRM_LEY_DATOS_PERSONALES__C", "CRM_AREA__C", "CRM_NUMERO_DOCUMENTO__C", "CRM_GENERO_SEXO__C", "CRM_DISTRITO_PARDOT__C", "CRM_FECHA_NACIMIENTO__C", "CRM_TIPO_DOCUMENTO_PERSONA__C", "CRM_TIPO_DOCUMENTO_EMPRESA__C", "CRM_NU_DOC_PERSONA__C", "CRM_NUM_DOC_EMPRESA__C", "CRM_TIPO_PERSONA_DEL__C", "CRM_SEDE__C", "CRM_OFICINA__C", "CRM_COMO_CONOCIO_TECSUP__C", "CRM_AREAS_INTERES__C", "CRM_PRODUCTO_INTERES_LISTA__C", "CRM_PRODUCTO_INTERES_TEXTO__C");
+            writer.writeHeader("SISID", "LASTNAME", "FIRSTNAME", "COMPANY", "MOBILEPHONE", "PHONE", "EMAIL", "STATUS", "LEADSOURCE", "OWNERID", "CRM_APELLIDO_MATERNO__C", "CRM_CARGO__C", "CRM_FECHA_LDP__C", "CRM_LEY_DATOS_PERSONALES__C", "CRM_AREA__C", "CRM_NUMERO_DOCUMENTO__C", "CRM_GENERO_SEXO__C", "CRM_DISTRITO_PARDOT__C", "CRM_FECHA_NACIMIENTO__C", "CRM_TIPO_DOCUMENTO_PERSONA__C", "CRM_TIPO_DOCUMENTO_EMPRESA__C", "CRM_NU_DOC_PERSONA__C", "CRM_NUM_DOC_EMPRESA__C", "CRM_TIPO_PERSONA_DEL__C", "CRM_SEDE__C", "CRM_OFICINA__C", "CRM_COMO_CONOCIO_TECSUP__C", "CRM_AREAS_INTERES__C", "CRM_PRODUCTO_INTERES_LISTA__C", "CRM_PRODUCTO_INTERES_TEXTO__C", "EMPRESA", "COMENTARIO", "SEGMENTO");
 
             for(Lead lead : leads) {
                 log.info(lead);
-                writer.write(lead, "sisid", "lastname", "firstname", "company", "mobilephone", "phone", "email", "status", "leadsource", "ownerid", "apematerno", "cargo", "fechalpd", "leyproteccion", "area", "documento", "sexo", "distrito", "nacimiento", "tipodocpersona", "tipodocempresa", "numdocpersona", "numdocempresa", "tipo", "sede", "oficina", "conocido", "areainteres", "familia", "producto");
+                writer.write(lead, "sisid", "lastname", "firstname", "company", "mobilephone", "phone", "email", "status", "leadsource", "ownerid", "apematerno", "cargo", "fechalpd", "leyproteccion", "area", "documento", "sexo", "distrito", "nacimiento", "tipodocpersona", "tipodocempresa", "numdocpersona", "numdocempresa", "tipo", "sede", "oficina", "conocido", "areainteres", "familia", "producto", "empresa", "comentario", "segmento");
             }
 
             writer.close();
@@ -159,7 +159,7 @@ public class ScheduledTask {
             reader.getHeader(true);
 
             Lead lead;
-            while( (lead = reader.read(Lead.class, new String[]{"id", "sisid", "lastname", "firstname", "company", "mobilephone", "phone", "email", "status", "leadsource", "ownerid", "apematerno", "cargo", "fechalpd", "leyproteccion", "area", "documento", "sexo", "distrito", "nacimiento", "tipodocpersona", "tipodocempresa", "numdocpersona", "numdocempresa", "tipo", "sede", "oficina", "conocido", "areainteres", "familia", "producto", "status"})) != null ) {
+            while( (lead = reader.read(Lead.class, "id", "sisid", "lastname", "firstname", "company", "mobilephone", "phone", "email", "status", "leadsource", "ownerid", "apematerno", "cargo", "fechalpd", "leyproteccion", "area", "documento", "sexo", "distrito", "nacimiento", "tipodocpersona", "tipodocempresa", "numdocpersona", "numdocempresa", "tipo", "sede", "oficina", "conocido", "areainteres", "familia", "producto", "empresa", "comentario", "segmento", "status")) != null ) {
                 log.info(String.format("lineNo=%s, rowNo=%s, user=%s", reader.getLineNumber(), reader.getRowNumber(), lead));
                 applicationService.registerLead(lead);
             }
@@ -173,14 +173,14 @@ public class ScheduledTask {
 
             reader.getHeader(true);
 
-            String message = "";
-            while( (lead = reader.read(Lead.class, "sisid", "lastname", "firstname", "company", "mobilephone", "phone", "email", "status", "leadsource", "ownerid", "apematerno", "cargo", "fechalpd", "leyproteccion", "area", "documento", "sexo", "distrito", "nacimiento", "tipodocpersona", "tipodocempresa", "numdocpersona", "numdocempresa", "tipo", "sede", "oficina", "conocido", "areainteres", "familia", "producto", "id")) != null ) {
+            StringBuilder message = new StringBuilder();
+            while( (lead = reader.read(Lead.class, "sisid", "lastname", "firstname", "company", "mobilephone", "phone", "email", "status", "leadsource", "ownerid", "apematerno", "cargo", "fechalpd", "leyproteccion", "area", "documento", "sexo", "distrito", "nacimiento", "tipodocpersona", "tipodocempresa", "numdocpersona", "numdocempresa", "tipo", "sede", "oficina", "conocido", "areainteres", "familia", "producto", "empresa", "comentario", "segmento", "id")) != null ) {
                 log.info(String.format("lineNo=%s, rowNo=%s, user=%s", reader.getLineNumber(), reader.getRowNumber(), lead));
-                message += lead.getSisid() + ": " + lead.getId() + "\n";
+                message.append(lead.getSisid()).append(": ").append(lead.getId()).append("\n");
             }
 
             // Send mail
-            mailer.sendMail(message);
+            mailer.sendMail(message.toString());
 
         }catch (Exception e){
             log.error(e, e);

@@ -98,6 +98,9 @@ public class ApplicationRepository {
                 lead.setAreainteres(record.get("CRM_AREAS_INTERES__C")!=null?(String)record.get("CRM_AREAS_INTERES__C"):null);
                 lead.setFamilia(record.get("CRM_PRODUCTO_INTERES_LISTA__C")!=null?(String)record.get("CRM_PRODUCTO_INTERES_LISTA__C"):null);
                 lead.setProducto(record.get("CRM_PRODUCTO_INTERES_TEXTO__C")!=null?(String)record.get("CRM_PRODUCTO_INTERES_TEXTO__C"):null);
+                lead.setEmpresa(record.get("EMPRESA")!=null?(String)record.get("EMPRESA"):null);
+                lead.setComentario(record.get("COMENTARIO")!=null?(String)record.get("COMENTARIO"):null);
+                lead.setSegmento(record.get("SEGMENTO")!=null?(String)record.get("SEGMENTO"):null);
 
                 leads.add(lead);
             }

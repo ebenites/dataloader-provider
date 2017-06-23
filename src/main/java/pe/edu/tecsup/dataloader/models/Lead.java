@@ -36,6 +36,9 @@ public class Lead {
     private String areainteres;
     private String familia;
     private String producto;
+    private String empresa;
+    private String comentario;
+    private String segmento;
 
     public String getId() {
         return id;
@@ -285,6 +288,30 @@ public class Lead {
         this.producto = producto;
     }
 
+    public String getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(String empresa) {
+        this.empresa = empresa;
+    }
+
+    public String getComentario() {
+        return comentario;
+    }
+
+    public void setComentario(String comentario) {
+        this.comentario = comentario;
+    }
+
+    public String getSegmento() {
+        return segmento;
+    }
+
+    public void setSegmento(String segmento) {
+        this.segmento = segmento;
+    }
+
     @Override
     public String toString() {
         return "Lead{" +
@@ -319,6 +346,9 @@ public class Lead {
                 ", areainteres='" + areainteres + '\'' +
                 ", familia='" + familia + '\'' +
                 ", producto='" + producto + '\'' +
+                ", empresa='" + empresa + '\'' +
+                ", comentario='" + comentario + '\'' +
+                ", segmento='" + segmento + '\'' +
                 '}';
     }
 }
