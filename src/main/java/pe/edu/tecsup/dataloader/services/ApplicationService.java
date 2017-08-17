@@ -3,6 +3,7 @@ package pe.edu.tecsup.dataloader.services;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pe.edu.tecsup.dataloader.models.Contact;
 import pe.edu.tecsup.dataloader.models.Lead;
 import pe.edu.tecsup.dataloader.models.User;
 import pe.edu.tecsup.dataloader.repositories.ApplicationRepository;
@@ -33,6 +34,16 @@ public class ApplicationService {
     public void registerLead(Lead lead) throws Exception {
         log.info("calling registerLead: ");
         applicationRepository.registerLead(lead);
+    }
+
+    public List<Contact> getContacts() throws Exception {
+        log.info("calling getContacts: ");
+        return applicationRepository.getContacts();
+    }
+
+    public void registerContact(Contact contact) throws Exception {
+        log.info("calling registerContact: ");
+        applicationRepository.registerContact(contact);
     }
 
 }

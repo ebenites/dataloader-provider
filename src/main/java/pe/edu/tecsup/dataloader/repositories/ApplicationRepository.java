@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
+import pe.edu.tecsup.dataloader.models.Contact;
 import pe.edu.tecsup.dataloader.models.Lead;
 import pe.edu.tecsup.dataloader.models.User;
 
@@ -119,6 +120,74 @@ public class ApplicationRepository {
         try {
             String sql = "INSERT INTO WEB_INTERES_CRM (SISID, CRMID) VALUES (?, ?)";
             jdbcTemplate.update(sql, lead.getSisid(), lead.getId());
+        }catch (Exception e){
+            log.error(e, e);
+//            throw e;
+        }
+    }
+
+    public List<Contact> getContacts() throws Exception {
+        log.info("getContacts");
+        try {
+            SimpleJdbcCall simpleJdbcCall = new SimpleJdbcCall(jdbcTemplate);
+
+            simpleJdbcCall.withSchemaName("DOCENCIA").withCatalogName("SDOC").withProcedureName("CONTACTOS_SF");
+
+            SqlParameterSource in = new MapSqlParameterSource();
+
+            Map<String, Object> out = simpleJdbcCall.execute(in);
+            log.info(out);
+
+            List<Map<String, Object>> recordset = (ArrayList<Map<String, Object>>) out.get("S_C_RECORDSET");
+            log.info("Length of retrieved batches from database = "+recordset);
+
+            List<Contact> contacts = new ArrayList<>();
+
+            for(Map<String, Object> record : recordset) {
+
+                Contact contact = new Contact();
+                contact.setLastname(record.get("LASTNAME")!=null?(String)record.get("LASTNAME"):null);
+                contact.setCrmapellidomaternoc(record.get("CRM_APELLIDO_MATERNO__C")!=null?(String)record.get("CRM_APELLIDO_MATERNO__C"):null);
+                contact.setFirstname(record.get("FIRSTNAME")!=null?(String)record.get("FIRSTNAME"):null);
+                contact.setCrmsegundonombrec(record.get("CRM_SEGUNDO_NOMBRE__C")!=null?(String)record.get("CRM_SEGUNDO_NOMBRE__C"):null);
+                contact.setMobilephone(record.get("MOBILEPHONE")!=null?(String)record.get("MOBILEPHONE"):null);
+                contact.setHomephone(record.get("HOMEPHONE")!=null?(String)record.get("HOMEPHONE"):null);
+                contact.setEmail(record.get("EMAIL")!=null?(String)record.get("EMAIL"):null);
+                contact.setLeadsource(record.get("LEADSOURCE")!=null?(String)record.get("LEADSOURCE"):null);
+                contact.setOwnerid(record.get("OWNERID")!=null?(String)record.get("OWNERID"):null);
+                contact.setHedgenderc(record.get("HED__GENDER__C")!=null?(String)record.get("HED__GENDER__C"):null);
+                contact.setCrmtipodocumentoc(record.get("CRM_TIPO_DOCUMENTO__C")!=null?(String)record.get("CRM_TIPO_DOCUMENTO__C"):null);
+                contact.setCrmnumerodocumentoc(record.get("CRM_NUMERO_DOCUMENTO__C")!=null?(String)record.get("CRM_NUMERO_DOCUMENTO__C"):null);
+                contact.setCrmfechanacimientoc(record.get("CRM_FECHA_NACIMIENTO__C")!=null?(String)record.get("CRM_FECHA_NACIMIENTO__C"):null);
+                contact.setCrmdomicilio1c(record.get("CRM_DOMICILIO1__C")!=null?(String)record.get("CRM_DOMICILIO1__C"):null);
+                contact.setCrmestadocivilc(record.get("CRM_ESTADO_CIVIL__C")!=null?(String)record.get("CRM_ESTADO_CIVIL__C"):null);
+                contact.setCrmleydatospersonalesc(record.get("CRM_LEY_DATOS_PERSONALES__C")!=null?(String)record.get("CRM_LEY_DATOS_PERSONALES__C"):null);
+                contact.setCrmfechadatospersonalesc(record.get("CRM_FECHA_DATOS_PERSONALES__C")!=null?(String)record.get("CRM_FECHA_DATOS_PERSONALES__C"):null);
+                contact.setCrmsedec(record.get("CRM_SEDE__C")!=null?(String)record.get("CRM_SEDE__C"):null);
+                contact.setCrmoficinac(record.get("CRM_OFICINA__C")!=null?(String)record.get("CRM_OFICINA__C"):null);
+                contact.setProductointerestextoc(record.get("PRODUCTO_INTERES_TEXTO__C")!=null?(String)record.get("PRODUCTO_INTERES_TEXTO__C"):null);
+                contact.setTipodepersonac(record.get("TIPO_DE_PERSONA__C")!=null?(String)record.get("TIPO_DE_PERSONA__C"):null);
+                contact.setRecordtypeid(record.get("RECORDTYPEID")!=null?(String)record.get("RECORDTYPEID"):null);
+                contact.setCrmcodigoalumnoc(record.get("CRM_CODIGOALUMNO__C")!=null?(String)record.get("CRM_CODIGOALUMNO__C"):null);
+                contact.setDescription(record.get("DESCRIPTION")!=null?(String)record.get("DESCRIPTION"):null);
+
+                contacts.add(contact);
+            }
+
+            log.info("contacts: " + contacts);
+
+            return contacts;
+        }catch (Exception e){
+            log.error(e, e);
+            throw e;
+        }
+    }
+
+    public void registerContact(Contact contact) throws Exception {
+        log.info("registerContact: contact:" + contact);
+        try {
+            String sql = "UPDATE GENERAL.GEN_SUJETO SET MIGRASF=?, FECMIGRASF=SYSDATE, IDSF=? WHERE CODSUJETO=?";
+            jdbcTemplate.update(sql, 1, contact.getId(), contact.getCrmcodigoalumnoc());
         }catch (Exception e){
             log.error(e, e);
 //            throw e;

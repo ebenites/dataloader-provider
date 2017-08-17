@@ -15,6 +15,7 @@ import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.ICsvBeanReader;
 import org.supercsv.io.ICsvBeanWriter;
 import org.supercsv.prefs.CsvPreference;
+import pe.edu.tecsup.dataloader.models.Contact;
 import pe.edu.tecsup.dataloader.models.Lead;
 import pe.edu.tecsup.dataloader.models.User;
 import pe.edu.tecsup.dataloader.services.ApplicationService;
@@ -107,9 +108,11 @@ public class ScheduledTask {
             processingWriteLeads();
         }else if("lead-read".equalsIgnoreCase(TEST)){
             processingReaderLeads();
+        }else if("contact-write".equalsIgnoreCase(TEST)){
+            processingWriteContacts();
+        }else if("contact-read".equalsIgnoreCase(TEST)){
+            processingReaderContacts();
         }
-
-
     }
 
     @Scheduled(cron="0 * * * * *")
@@ -185,6 +188,78 @@ public class ScheduledTask {
         }catch (Exception e){
             log.error(e, e);
             mailer.sendMail("ERROR en processingReaderLeads: " + e.toString());
+        }
+    }
+
+
+    @Scheduled(cron="0 0 6 * * *")
+    public void processingWriteContacts() {
+        log.info("processingWriteContacts ...");
+        try {
+
+            List<Contact> contacts = applicationService.getContacts();
+            log.info("contacts: " + contacts.size());
+
+            // CSV Writer
+            ICsvBeanWriter writer = new CsvBeanWriter(new FileWriter(CSVDATAPATH+"contact.csv"), CsvPreference.STANDARD_PREFERENCE);
+
+            writer.writeHeader("CRM_CODIGOALUMNO__C", "LEADSOURCE", "CRM_APELLIDO_MATERNO__C", "PRODUCTO_INTERES_TEXTO__C", "CRM_LEY_DATOS_PERSONALES__C", "EMAIL", "HOMEPHONE", "MOBILEPHONE", "CRM_DOMICILIO1__C", "CRM_SEGUNDO_NOMBRE__C", "RECORDTYPEID", "TIPO_DE_PERSONA__C", "CRM_SEDE__C", "CRM_FECHA_DATOS_PERSONALES__C", "DESCRIPTION", "FIRSTNAME", "CRM_OFICINA__C", "OWNERID", "CRM_ESTADO_CIVIL__C", "CRM_FECHA_NACIMIENTO__C", "CRM_NUMERO_DOCUMENTO__C", "CRM_TIPO_DOCUMENTO__C", "LASTNAME", "HED__GENDER__C");
+
+            for(Contact contact : contacts) {
+                log.info(contact);
+                writer.write(contact, "crmcodigoalumnoc", "leadsource", "crmapellidomaternoc", "productointerestextoc", "crmleydatospersonalesc", "email", "homephone", "mobilephone", "crmdomicilio1c", "crmsegundonombrec", "recordtypeid", "tipodepersonac", "crmsedec", "crmfechadatospersonalesc", "description", "firstname", "crmoficinac", "ownerid", "crmestadocivilc", "crmfechanacimientoc", "crmnumerodocumentoc", "crmtipodocumentoc", "lastname", "hedgenderc");
+            }
+
+            writer.close();
+
+        }catch (Exception e){
+            log.error(e, e);
+            mailer.sendMail("ERROR en processingWriteContacts: " + e.toString());
+        }
+    }
+
+    @Scheduled(cron="0 30 6 * * *")
+    public void processingReaderContacts() {
+        log.info("processingReaderContacts ...");
+        try {
+            log.info("Reading Success ...");
+
+            ICsvBeanReader reader = new CsvBeanReader(new FileReader(CSVOUTPUTPATH+"contact_success.csv"), CsvPreference.STANDARD_PREFERENCE);
+
+            final CellProcessor[] processors = new CellProcessor[] {
+                    new UniqueHashCode(new ParseInt()), // id (must be unique)
+                    new NotNull(), // sisid
+            };
+
+            reader.getHeader(true);
+
+            Contact contact;
+            while( (contact = reader.read(Contact.class, "id", "crmcodigoalumnoc", "leadsource", "crmapellidomaternoc", "productointerestextoc", "crmleydatospersonalesc", "email", "homephone", "mobilephone", "crmdomicilio1c", "crmsegundonombrec", "recordtypeid", "tipodepersonac", "crmsedec", "crmfechadatospersonalesc", "description", "firstname", "crmoficinac", "ownerid", "crmestadocivilc", "crmfechanacimientoc", "crmnumerodocumentoc", "crmtipodocumentoc", "lastname", "hedgenderc", "status")) != null ) {
+                log.info(String.format("lineNo=%s, rowNo=%s, user=%s", reader.getLineNumber(), reader.getRowNumber(), contact));
+                applicationService.registerContact(contact);
+            }
+
+            reader.close();
+
+
+            log.info("Reading Errors ...");
+
+            reader = new CsvBeanReader(new FileReader(CSVOUTPUTPATH+"contact_error.csv"), CsvPreference.STANDARD_PREFERENCE);
+
+            reader.getHeader(true);
+
+            StringBuilder message = new StringBuilder();
+            while( (contact = reader.read(Contact.class, "crmcodigoalumnoc", "leadsource", "crmapellidomaternoc", "productointerestextoc", "crmleydatospersonalesc", "email", "homephone", "mobilephone", "crmdomicilio1c", "crmsegundonombrec", "recordtypeid", "tipodepersonac", "crmsedec", "crmfechadatospersonalesc", "description", "firstname", "crmoficinac", "ownerid", "crmestadocivilc", "crmfechanacimientoc", "crmnumerodocumentoc", "crmtipodocumentoc", "lastname", "hedgenderc", "id")) != null ) {
+                log.info(String.format("lineNo=%s, rowNo=%s, user=%s", reader.getLineNumber(), reader.getRowNumber(), contact));
+                message.append(contact.getCrmcodigoalumnoc()).append(": ").append(contact.getId()).append("\n");
+            }
+
+            // Send mail
+            mailer.sendMail(message.toString());
+
+        }catch (Exception e){
+            log.error(e, e);
+            mailer.sendMail("ERROR en processingReaderContacts: " + e.toString());
         }
     }
 
