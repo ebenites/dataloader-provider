@@ -192,7 +192,7 @@ public class ScheduledTask {
     }
 
 
-    @Scheduled(cron="0 0 6 * * *")
+    @Scheduled(cron="0 0 2 * * *")
     public void processingWriteContacts() {
         log.info("processingWriteContacts ...");
         try {
@@ -218,7 +218,7 @@ public class ScheduledTask {
         }
     }
 
-    @Scheduled(cron="0 30 6 * * *")
+    @Scheduled(cron="0 30 2 * * *")
     public void processingReaderContacts() {
         log.info("processingReaderContacts ...");
         try {
